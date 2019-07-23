@@ -1,0 +1,6 @@
+{
+    "require": {
+        "calcinai/xero-php": "^1.8",
+        "catfan/medoo": "^1.6"
+    }
+}

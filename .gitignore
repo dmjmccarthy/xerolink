@@ -1,0 +1,11 @@
+### App Config ###
+config.php
+
+### Composer ###
+composer.phar
+/vendor/
+
+### Certificates ###
+*.pem
+*.pfx
+*.cer
