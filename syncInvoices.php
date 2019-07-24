@@ -119,13 +119,13 @@ function jobNoFromInvoiceReference($xeroReference) {
     //var_dump($strElems);
     if (sizeof($strElems) < 3) {
         //not enough
-        echo '***WARNING: Invoice reference does not contain job number in correct format: ';
+        echo '***WARNING: Check reference (reference incoherence): ';
         return "";
     } else {
         if (is_numeric($strElems[1]) && is_numeric($strElems[2])) {
             return $strElems[1] . "/" . $strElems[2];
         } else {
-            echo '***WARNING: Invoice reference does not contain job number in correct format: ';
+            echo '***WARNING: Check reference (reference incoherence): ';
             return "";
         }
     }
