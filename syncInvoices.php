@@ -71,7 +71,7 @@ do {
 
 } while ($morePages == true);
 
-echo $totalUpdateRows . " record(s) updated, " . $totalNewRows . " record(s) inserted, " . $totalWarnRows. " record(s) failed to update.\r\n";
+echo $totalUpdateRows . " invoices(s) updated, " . $totalNewRows . " invoices(s) inserted, " . $totalWarnRows. " invoices(s) failed to update.\r\n";
 
 /* --- READ IN CREDIT NOTES FROM XERO --- */
 /*$creditNotes = $xero->load('Accounting\\CreditNote')
@@ -89,6 +89,61 @@ foreach($creditNotes as $cr) {
     $cr->Status . ", " . 
     $cr->CreditNoteID . "\r\n");
 }*/
+$totalUpdateRows = 0; $totalNewRows = 0; $totalWarnRows = 0;
+$pageNo = 1;
+do {
+    $creditNotes = $xero->load('Accounting\\CreditNote')
+        ->page($pageNo)
+        ->where('Type', XeroPHP\Models\Accounting\CreditNote::CREDIT_NOTE_TYPE_ACCRECCREDIT)
+        ->modifiedAfter($lastSyncDate)
+        ->execute(); 
+
+    foreach($creditNotes as $cr) {
+        $crdata = [
+            "XeroID" => $cr->CreditNoteID,
+            "JobNo" => jobNoFromInvoiceReference($cr->Reference),
+            "InvoiceNumber" => $cr->CreditNoteNumber,
+            "ContactName" => $cr->Contact->Name,
+            "SubTotal" => -1 * friendlyInvoiceSubtotal($cr->SubTotal,$cr->Status),
+            "InvoiceDate" => $cr->Date->format('Y-m-d'),
+            "InvoiceStatus" => friendlyInvoiceStatus($cr->Status)
+        ];
+
+        if ($database->has("xeroInvoices",["XeroID" => $cr->InvoiceID])) {
+            $updatedrows = $database->update("XeroInvoices",$crdata,["XeroID" => $cr>InvoiceID])->rowCount();
+            if ($updatedrows > 0) {
+                ++$totalUpdateRows;
+                echo "Credit note " . $cr->CreditNoteNumber . " updated\r\n";
+            } else {
+                ++$totalWarnRows;
+                echo "***WARNING: Credit note " . $cr->CreditNoteNumber . " not updated\r\n";
+            };
+        } else {
+            $updatedrows = $database->insert("XeroInvoices",$crdata)->rowCount(); 
+            if ($updatedrows > 0) {
+                    ++$totalNewRows;
+                    echo "Credit note " . $cr->CreditNoteNumber . " inserted\r\n";
+                } else {
+                    ++$totalWarnRows;
+                    echo "***WARNING: Credit note " . $cr->CreditNoteNumber . " not updated\r\n";
+                };
+        }
+    }
+    
+    // Check if there's another page of invoices
+    $noOfInvoicesOnPage = count($creditNotes);
+    if( $noOfInvoicesOnPage == 100) {
+        ++$pageNo;
+        $morePages = true;
+    } else {$morePages = false;};
+
+} while ($morePages == true);
+
+echo $totalUpdateRows . " credit note(s) updated, " . $totalNewRows . " credit note(s) inserted, " . $totalWarnRows. " credit note(s) failed to update.\r\n";
+
+
+/* --- Update cached columns in database --- */
+$database->query("EXEC sp_UpdateCachedJobColumns;");
 
 /* --- Record Sync date --- */
 $out = $database->update("options",["option_value"=>date('Y-m-d')],["option_name"=>"lastSyncDate"])->rowCount();
@@ -138,7 +193,6 @@ function friendlyInvoiceSubtotal($subtotal,$invoiceStatus) {
         case "PAID":
             return $subtotal;
         case "DRAFT":
-            return null;
         case "VOIDED":
         case "DELETED":
         case "SUBMITTED":
