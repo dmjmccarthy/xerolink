@@ -1,6 +1,5 @@
 <?php
-//These are the minimum settings - for more options, refer to examples/config.php
-$config = [
+$xeroconfig = [
     'oauth' => [
         'callback' => 'http://localhost/',
         'consumer_key' => 'k',

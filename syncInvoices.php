@@ -74,21 +74,6 @@ do {
 echo $totalUpdateRows . " invoices(s) updated, " . $totalNewRows . " invoices(s) inserted, " . $totalWarnRows. " invoices(s) failed to update.\r\n";
 
 /* --- READ IN CREDIT NOTES FROM XERO --- */
-/*$creditNotes = $xero->load('Accounting\\CreditNote')
-    ->where('Type', XeroPHP\Models\Accounting\CreditNote::CREDIT_NOTE_TYPE_ACCRECCREDIT)
-    ->execute(); 
-
-//print_r($creditNotes);
-
-foreach($creditNotes as $cr) {
-    echo($cr->CreditNoteNumber . ", ". 
-    $cr->Reference . ", " . 
-    $cr->Contact->Name . ", ". 
-    $cr->Date->format('Y-m-d') . ", ". 
-    $cr->SubTotal . ", " . 
-    $cr->Status . ", " . 
-    $cr->CreditNoteID . "\r\n");
-}*/
 $totalUpdateRows = 0; $totalNewRows = 0; $totalWarnRows = 0;
 $pageNo = 1;
 do {
