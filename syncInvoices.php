@@ -109,8 +109,8 @@ do {
             "InvoiceStatus" => friendlyInvoiceStatus($cr->Status)
         ];
 
-        if ($database->has("xeroInvoices",["XeroID" => $cr->InvoiceID])) {
-            $updatedrows = $database->update("XeroInvoices",$crdata,["XeroID" => $cr>InvoiceID])->rowCount();
+        if ($database->has("xeroInvoices",["XeroID" => $cr->CreditNoteID])) {
+            $updatedrows = $database->update("XeroInvoices",$crdata,["XeroID" => $cr>CreditNoteID])->rowCount();
             if ($updatedrows > 0) {
                 ++$totalUpdateRows;
                 echo "Credit note " . $cr->CreditNoteNumber . " updated\r\n";
