@@ -57,7 +57,7 @@ do {
                     echo "Invoice " . $inv->InvoiceNumber . " inserted\r\n";
                 } else {
                     ++$totalWarnRows;
-                    echo "***WARNONG: Invoice " . $inv->InvoiceNumber . " not updated\r\n";
+                    echo "***WARNING: Invoice " . $inv->InvoiceNumber . " not updated\r\n";
                 };
         }
     }
